@@ -10,7 +10,7 @@ class NewsServices {
     List<NewsModel> newsdata = [];
     try {
       Response response = await dio.get(
-          "https://newsapi.org/v2/top-headlines?country=us&apiKey=f003149754474f69aa5b39a271ddacf3&category=$category");
+          "https://newsapi.org/v2/top-headlines?country=us&apiKey=e7522e0321984eb483848ca3cd566dda&category=$category");
       Map<String, dynamic> jsondata = response.data;
 
       List<dynamic> articles = jsondata["articles"];

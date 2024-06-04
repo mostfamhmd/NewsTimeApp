@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:news_time/Components/News%20Components/news_items_component.dart';
 import 'package:news_time/Model/news_model.dart';
-import 'package:news_time/Screens/details_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class NewsSliverListComponet extends StatelessWidget {
-  NewsSliverListComponet({
+class NewsSliverListComponet extends StatefulWidget {
+  const NewsSliverListComponet({
     super.key,
     required this.news,
   });
@@ -12,36 +13,44 @@ class NewsSliverListComponet extends StatelessWidget {
   final List<NewsModel> news;
 
   @override
+  State<NewsSliverListComponet> createState() => _NewsSliverListComponetState();
+}
+
+class _NewsSliverListComponetState extends State<NewsSliverListComponet> {
+  Future<void> _launchURL(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+        webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: true,
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error launching URL: $e');
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          final newsDetials =
-              news[index]; // Retrieve the news details for the current index
+          final newsDetials = widget.news[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailsScreen(
-                      image: newsDetials.image ??
-                          "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png", // Use null-aware operator
-                      content: newsDetials.content,
-                      title: newsDetials.title,
-                      publishedAt: newsDetials.publishedAt,
-                      url: newsDetials.url,
-                      description: newsDetials.description,
-                    ),
-                  ),
-                );
+              onTap: () async {
+                await _launchURL(newsDetials.url);
               },
               child: NewsComponent(items: newsDetials),
             ),
           );
         },
-        childCount: news.length,
+        childCount: widget.news.length,
       ),
     );
   }
